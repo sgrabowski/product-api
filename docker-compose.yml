@@ -1,0 +1,47 @@
+version:  '3.3'
+
+services:
+  nginx:
+    image: nginx:1.17.10-alpine
+    restart: on-failure
+    volumes:
+      - '.:/app'
+      - './docker/nginx/conf.d:/etc/nginx/conf.d:ro'
+      - './docker/nginx/certs:/etc/nginx/certs'
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - php
+
+  php:
+    build:
+      context: ./docker/php
+    volumes:
+      - '.:/app'
+    restart: on-failure
+    environment:
+      - 'COMPOSER_HOME=/tmp/composer'
+      - 'COMPOSER_ALLOW_SUPERUSER=1'
+    user: "${DOCKER_USER_ID:-1000}:${DOCKER_GROUP_ID:-1000}"
+
+  database:
+    image: mysql:8.0.20
+    restart: on-failure
+    command: --default-authentication-plugin=mysql_native_password
+    volumes:
+      - mysql_data:/var/lib/mysql
+    ports:
+      - 3306:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
+
+volumes:
+  mysql_data:
+  rabbitmq_data:
