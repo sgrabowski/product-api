@@ -1,4 +1,4 @@
-FROM php:7.2-fpm
+FROM php:7.4-fpm
 
 # dependencies required to install php tools / extensions
 RUN apt-get update && apt-get install -y \
@@ -15,7 +15,8 @@ RUN apt-get update && apt-get install -y \
         libmcrypt-dev \
         libmemcached-dev \
         librabbitmq-dev \
-        libssh-dev
+        libssh-dev \
+        libzip-dev
 
 # install extensions
 RUN docker-php-ext-install -j$(nproc) \
